@@ -31,7 +31,7 @@ def inst_to_dict(inst, delete_id = True):
         dat.pop("num")
     return dat
 
-start = pd.read_csv("/root/quant/bots/scrapy_roots/scrapy_roots/start_urls.csv")
+start = pd.read_csv("/home/zooloodent/bots/scrapy_roots/scrapy_roots/start_urls.csv")
 start = start["link"].tolist()
 # start
 

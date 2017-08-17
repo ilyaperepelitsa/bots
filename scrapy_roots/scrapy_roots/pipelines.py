@@ -18,7 +18,7 @@ def inst_to_dict(inst, delete_id = True):
     return dat
 
 
-engine_webpage = create_engine("sqlite:////root/quant/bots/scrapy_roots/scrapy_roots/webpage.db", echo = False)
+engine_webpage = create_engine("sqlite:////home/zooloodent/bots/scrapy_roots/scrapy_roots/webpage.db", echo = False)
 Base_webpage = declarative_base()
 
 class Webpage(Base_webpage):
