@@ -19,6 +19,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Enum
 from sqlalchemy.sql import select
 
+from scrapy.exceptions import DropItem
+
+import pandas as pd
+
 def inst_to_dict(inst, delete_id = True):
     dat = {}
     for column in inst.__table__.columns:
@@ -27,6 +31,9 @@ def inst_to_dict(inst, delete_id = True):
         dat.pop("num")
     return dat
 
+start = pd.read_csv("/root/quant/bots/scrapy_roots/scrapy_roots/start_urls.csv")
+start = start["link"].tolist()
+# start
 
 
 engine_crawled = create_engine("sqlite:///crawled.db", echo = False)
@@ -50,7 +57,7 @@ Base_crawled.metadata.create_all(engine_crawled)
 Session_crawled = sessionmaker(bind = engine_crawled)
 session_crawled = Session_crawled()
 
-[inst_to_dict(w) for w in session_crawled.query(Crawled)]
+# [inst_to_dict(w) for w in session_crawled.query(Crawled)]
 
 class DomainLinks(Item):
     links = Field()
@@ -58,7 +65,7 @@ class DomainLinks(Item):
 class EasySpider(CrawlSpider):
     name = 'easy'
     # allowed_domains = ['web']
-    start_urls = ['http://liguriafoods.com/where-to-buy/']
+    start_urls = start
 
     rules = (
     # Rule(LinkExtractor(restrict_xpaths="//*[not(contains(text(),'@'))]")),
@@ -74,10 +81,17 @@ class EasySpider(CrawlSpider):
     # def parse_links(self, response):
 
 
+    # def _parse_response(self, response): # When writing crawl spider rules, avoid using parse as callback, since the CrawlSpider uses the parse method itself to implement its logic. So if you override the parse method, the crawl spider will no longer work.
+    #     for request_or_item in CrawlSpider.parse(self, response):
+    #         if isinstance(request_or_item, Request):
+    #             request_or_item = request_or_item.replace(meta = {'start_url': response.meta['start_url']})
+    #         yield request_or_item
+
 
     def parse(self, response):
 
-        crawledLinks = []
+        # pew = ScrapyRootsItem()
+        # pew["title"] = response.xpath('//title/text()').extract()
 
         l = ItemLoader(item = ScrapyRootsItem(), response = response)
         l.add_xpath("title", '//title/text()')
@@ -85,58 +99,11 @@ class EasySpider(CrawlSpider):
         # l.add_xpath("paragraphs", '//p/text()')
         l.add_xpath("paragraphs", '//p/text()', Join())
         l.add_xpath("links_text", '//a/text()')
-        l.add_xpath("urls", '//a/@href')
-
+        # l.add_xpath("urls", '//a/@href')
+        l.add_value("time", datetime.datetime.now())
         l.add_value('url', response.url)
-        # l.add_value('start_url', )
-        # l.add_value('project', self.settings.get('BOT_NAME'))
-        # l.add_value('spider', self.name)
-        # l.add_value('server', socket.gethostname())
-        # l.add_value('date', datetime.datetime.now())
-
-        # print(l.load_item())
-
-        # yield result
-        # print(domain)
-        # print(links)
-        # print("\n\n")
-
-
-        # item = DomainLinks()
-        # item['links'] = []
-        # domain = response.url.replace("http://","").replace("https://","").strip("www.").strip("ww2.").split("/")[0]
-        # links = LinkExtractor(allow=(),deny = ()).extract_links(response)
-        # links = [link for link in links if domain in link.url]
-        # links = [link for link in links if link.url.replace("http://","").replace("https://","").startswith(domain) and link.url != response.url]
-        # print(links)
-        # # Filter duplicates and append to
-        # for link in links:
-        #     if link.url not in item['links']:
-        #         item['links'].append(link.url)
-        #
-        # print(item)
-        # return item["links"]
-
-
-
-        # item = []
-        # domain = response.url.replace("http://","").replace("https://","").strip("www.").strip("ww2.").split("/")[0]
-        # links = LinkExtractor(allow=(),deny = ()).extract_links(response)
-        # links = [link for link in links if domain in link.url]
-        # links = [link for link in links if link.url.replace("http://","").replace("https://","").startswith(domain) and link.url != response.url]
-        # print(links)
-        # # Filter duplicates and append to
-        # for link in links:
-        #     if link.url not in item:
-        #         item.append(link.url)
-        #
-        # print(item)
-        # return item
-        #
-        #
-        pew = ScrapyRootsItem()
-        pew["title"] = response.xpath('//title/text()').extract()
-
+        item = l.load_item()
+        yield(item)
 
 
         item = []
@@ -150,7 +117,7 @@ class EasySpider(CrawlSpider):
         for link in links:
             if link.url not in item:
                 item.append(link.url)
-
+        # print(item)
         # for i in item:
         #     print("\n")
         #     print(i)
@@ -173,11 +140,3 @@ class EasySpider(CrawlSpider):
                 req.meta["dont_redirect"] = True
                 req.meta["handle_httpstatus_list"] = [301, 302, 303]
                 yield req
-
-
-
-
-        # print(item)
-        # print(crawledLinks)
-        # return(pew)
-        # print(pew["title"])

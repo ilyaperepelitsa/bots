@@ -64,9 +64,11 @@ ROBOTSTXT_OBEY = False
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'scrapy_roots.pipelines.ScrapyRootsPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'scrapy_roots.pipelines.ProcessItem': 300,
+   'scrapy_roots.pipelines.RecordWebpage': 900,
+}
+
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html

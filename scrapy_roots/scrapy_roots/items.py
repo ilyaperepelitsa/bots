@@ -14,11 +14,14 @@ class ScrapyRootsItem(Item):
     headers = Field()
     paragraphs = Field()
     links_text = Field()
-    urls = Field()
+    # urls = Field()
 
     # Housekeeping
     url = Field()
-    server = Field()
+    domain = Field()
+    # server = Field()
+    # start_url = Field()
+    time = Field()
 
     # define the fields for your item here like:
     # name = scrapy.Field()
