@@ -83,7 +83,7 @@ class EasySpider(CrawlSpider):
         l.add_xpath("title", '//title/text()')
         l.add_xpath("headers", '//h1/text()')
         # l.add_xpath("paragraphs", '//p/text()')
-        l.add_xpath("paragraphs", '//p/text()', MapCompose(str.strip), Join())
+        l.add_xpath("paragraphs", '//p/text()', Join())
         l.add_xpath("links_text", '//a/text()')
         l.add_xpath("urls", '//a/@href')
 
@@ -140,11 +140,11 @@ class EasySpider(CrawlSpider):
 
 
         item = []
-        domain = response.url.replace("http://","").replace("https://","").strip("www.").strip("ww2.").split("/")[0]
+        domain = response.url.replace("http://","").replace("https://","").replace("www.", "").replace("ww2.", "").split("/")[0]
         links = LinkExtractor(allow=(),deny = (), unique = True).extract_links(response)
         links = [link for link in links if domain in link.url]
         # print(links)
-        links = [link for link in links if link.url.replace("http://","").replace("https://","").startswith(domain) and link.url != response.url]
+        links = [link for link in links if link.url.replace("http://","").replace("https://","").replace("www.", "").replace("ww2.", "").startswith(domain) and link.url != response.url]
         # print(links)
         # Filter duplicates and append to
         for link in links:
